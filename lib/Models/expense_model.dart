@@ -5,11 +5,11 @@ part 'expense_model.g.dart';
 /// Creating Class that stores family info:
 
 @HiveType(typeId: 0)
-class ExpenseModel {
+class ExpenseModel extends HiveObject {
   // class fields
-  // @HiveField(0) String id;
+
   @HiveField(1)
-  String itemName;
+  final String itemName;
   @HiveField(2)
   int quantity;
   @HiveField(3)
@@ -25,7 +25,6 @@ class ExpenseModel {
   ExpenseModel({
     this.date,
     this.description,
-    // this.id,
     this.itemName,
     this.price,
     this.quantity,

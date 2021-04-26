@@ -14,17 +14,22 @@ dependencies:
   charts_flutter: ^0.10.0
   cupertino_icons: ^1.0.2
   google_fonts: ^2.0.0
+  
+  # Hive Database
   hive: ^2.0.3
   hive_flutter: ^1.0.0
 
+  # For Date Formatting
   intl: ^0.17.0
   path_provider: ^2.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
+  # Hive Database Generators
   hive_generator: ^1.0.1
-  build_runner:
+  build_runner: ^1.12.2
 
 flutter:
   uses-material-design: true

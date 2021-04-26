@@ -3,11 +3,11 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../Models/expense_model.dart';
+import '../boxes.dart';
 
 const String expensesBoxName = 'expenses';
 
 class Home extends StatefulWidget {
-  final formKey = GlobalKey<FormState>();
   Home({Key key, this.title});
 
   final String title;
@@ -17,6 +17,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Box<ExpenseModel> expensesBox;
   String itemName;
   DateTime date;
   String description;
@@ -24,38 +25,13 @@ class _HomeState extends State<Home> {
   int quantity;
   Payment payment;
 
-  //
-  final descriptionController = TextEditingController();
-  final quanityController = TextEditingController();
-  final itemNameController = TextEditingController();
-  final priceController = TextEditingController();
   final dateController = TextEditingController();
-  DateTime pickedDate;
 
-  //
-  final List<ExpenseModel> expenseItems = [
-    ExpenseModel(
-        // id: 'ID1',
-        date: DateTime.now(),
-        description: 'Officiis ipsam impedit et mollitia earum.',
-        itemName: 'Watch',
-        price: 150,
-        quantity: 2),
-    ExpenseModel(
-        // id: 'ID2',
-        date: DateTime.parse("2020-08-17 20:18:04Z"),
-        description: 'Commodi rerum accusantium eos quis totam optio.',
-        itemName: 'Shoes',
-        price: 279,
-        quantity: 1),
-    ExpenseModel(
-        // id: 'ID3',
-        date: DateTime.parse("2020-08-16 20:18:04Z"),
-        description: 'Veniam qui consequatur odio qui est dolorums.',
-        itemName: 'Window Blinds',
-        price: 405,
-        quantity: 2),
-  ];
+  @override
+  void dispose() {
+    Hive.box('expenseModels').close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,70 +45,55 @@ class _HomeState extends State<Home> {
           IconButton(
             icon: Icon(Icons.arrow_downward),
             onPressed: () {
-              expenseItems.sort((a, b) => a.itemName.compareTo(b.itemName));
+              // expenseItems.sort((a, b) => a.itemName.compareTo(b.itemName));
 
-              setState(() {
-                expenseItems.forEach((expense) => print(expense.itemName));
-              });
+              // setState(() {
+              //   expenseItems.forEach((expense) => print(expense.itemName));
+              // });
             },
           )
         ],
       ),
-      body: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // DISPLAYING OUR WEEKLY CHARTS
-          Container(
-            width: double.infinity,
-            child: Container(
-              height: 150,
-              child: Card(
-                child: Text('Weekly Charts Display'),
-              ),
-            ),
-          ),
-          ValueListenableBuilder(
-            valueListenable:
-                Hive.box<ExpenseModel>(expensesBoxName).listenable(),
-            builder: (context, Box<ExpenseModel> box, _) {
-              if (box.values.isEmpty)
-                return Center(
-                  child: Text("No contacts"),
-                );
-              return ListView.builder(
-                itemCount: box.values.length,
-                itemBuilder: (context, index) {
-                  ExpenseModel currentExpense = box.getAt(index);
-                  String payment = paymentString[currentExpense.payment];
-                  return Card(
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onLongPress: () {/* ... */},
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(height: 5),
-                            Text(currentExpense.itemName),
-                            SizedBox(height: 5),
-                            Text(currentExpense.description),
-                            SizedBox(height: 5),
-                            Text("Price: ${currentExpense.price}"),
-                            SizedBox(height: 5),
-                            Text("Payment: $payment"),
-                            SizedBox(height: 5),
-                          ],
-                        ),
-                      ),
+      body: ValueListenableBuilder<Box<ExpenseModel>>(
+        valueListenable: Boxes.getExpenses().listenable(),
+        builder: (context, box, _) {
+          //
+          List<int> keys = box.keys.cast<int>().toList();
+          return ListView.builder(
+            itemCount: keys.length,
+            itemBuilder: (context, index) {
+              //
+              final int key = keys[index];
+
+              final ExpenseModel currentExpense = box.get(key);
+              String payment = paymentString[currentExpense.payment];
+              return Card(
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(height: 5),
+                        Text('currentExpense.itemName'), /// This shows an error too
+                        SizedBox(height: 5),
+                        Text(currentExpense.description.toString()),
+                        SizedBox(height: 5),
+                        // SizedBox(height: 5),
+                        Text('${currentExpense.quantity}'),
+                        Text("Price: ${currentExpense.price}"),
+                        SizedBox(height: 5),
+                        Text("Payment: $payment"),
+                        SizedBox(height: 5),
+                      ],
                     ),
-                  );
-                },
+                  ),
+                ),
               );
             },
-          ),
-        ],
+          );
+        },
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
@@ -230,7 +191,6 @@ class _HomeState extends State<Home> {
                                     labelText: 'Pick your date'),
                                 readOnly: true,
                                 controller: dateController,
-                                //decoration: InputDecoration(hintText: 'Pick your Date'),
                                 onTap: () async {
                                   var date = await showDatePicker(
                                       context: context,
