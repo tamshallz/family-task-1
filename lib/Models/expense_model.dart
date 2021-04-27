@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 
 part 'expense_model.g.dart';
 
@@ -9,7 +10,7 @@ class ExpenseModel extends HiveObject {
   // class fields
 
   @HiveField(1)
-  final String itemName;
+  String itemName;
   @HiveField(2)
   int quantity;
   @HiveField(3)
