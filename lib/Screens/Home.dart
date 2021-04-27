@@ -18,18 +18,36 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Box<ExpenseModel> expensesBox;
-  String itemName;
+  final itemNameController = TextEditingController();
+  final itemDescriptionController = TextEditingController();
+  final itemPriceController = TextEditingController();
+  final itemQuantityController = TextEditingController();
+
+  // final itemDescriptionController = TextEditingController();
+  // String itemName;
   DateTime date;
-  String description;
-  double price;
-  int quantity;
+
+  // String description;
+  // double price;
+  // int quantity;
   Payment payment;
 
   final dateController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     Hive.box('expenseModels').close();
+
+    /// Todo: Always consider disposing off controllers to avoid memory leaks
+    itemNameController.dispose();
+    itemDescriptionController.dispose();
+    itemPriceController.dispose();
+    itemQuantityController.dispose();
     super.dispose();
   }
 
@@ -76,7 +94,13 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         SizedBox(height: 5),
-                        Text('currentExpense.itemName'), /// This shows an error too
+
+                        /// Todo: This was showing errors because the item name and description
+                        /// where not saved in the box, consider checking for null values in
+                        /// Text Widgets to avoid null errors
+                        Text(currentExpense?.itemName ?? "No name"),
+
+                        /// This shows an error too
                         SizedBox(height: 5),
                         Text(currentExpense.description.toString()),
                         SizedBox(height: 5),
@@ -134,11 +158,37 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                               ),
+                              SizedBox(height: 20.0),
+                              // _buildInputField('Item Name', 'value', 'itemName'),
+                              // _buildInputField('Description', 'value', 'description'),
+
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                child: TextFormField(
+                                  keyboardType: TextInputType.text,
+                                  textCapitalization: TextCapitalization.sentences,
+                                  textInputAction: TextInputAction.next,
+                                  controller: itemNameController,
+                                  decoration: InputDecoration(
+                                    labelText: "Item Name",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
                               SizedBox(height: 5.0),
-                              _buildInputField(
-                                  'Item Name', 'value', 'itemName'),
-                              _buildInputField(
-                                  'Description', 'value', 'description'),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                child: TextFormField(
+                                  keyboardType: TextInputType.text,
+                                  textCapitalization: TextCapitalization.sentences,
+                                  textInputAction: TextInputAction.next,
+                                  controller: itemDescriptionController,
+                                  decoration: InputDecoration(
+                                    labelText: "Item Description",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
 
                               // PRICE INPUT
                               Padding(
@@ -148,21 +198,19 @@ class _HomeState extends State<Home> {
                                       borderRadius: BorderRadius.circular(3),
                                       border: Border.all(color: Colors.grey)),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
                                     child: TextFormField(
+                                      controller: itemPriceController,
                                       keyboardType: TextInputType.number,
-
                                       // autofocus: true,
-                                      initialValue: "",
+                                      // initialValue: "",
                                       decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: 'Price'),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          price = double.parse(value);
-                                        });
-                                      },
+                                          border: InputBorder.none, labelText: 'Price'),
+                                      // onChanged: (value) {
+                                      //   setState(() {
+                                      //     price = double.parse(value);
+                                      //   });
+                                      // },
                                     ),
                                   ),
                                 ),
@@ -172,23 +220,22 @@ class _HomeState extends State<Home> {
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 15),
                                 child: TextField(
+                                  controller: itemQuantityController,
                                   keyboardType: TextInputType.number,
                                   // autofocus: true,
                                   decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Quantity'),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      quantity = int.parse(value);
-                                    });
-                                  },
+                                      border: OutlineInputBorder(), labelText: 'Quantity'),
+                                  // onChanged: (value) {
+                                  //   setState(() {
+                                  //     quantity = int.parse(value);
+                                  //   });
+                                  // },
                                 ),
                               ),
 
                               TextField(
                                 decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Pick your date'),
+                                    border: OutlineInputBorder(), labelText: 'Pick your date'),
                                 readOnly: true,
                                 controller: dateController,
                                 onTap: () async {
@@ -197,8 +244,7 @@ class _HomeState extends State<Home> {
                                       initialDate: DateTime.now(),
                                       firstDate: DateTime(1900),
                                       lastDate: DateTime(2100));
-                                  dateController.text =
-                                      date.toString().substring(0, 10);
+                                  dateController.text = date.toString().substring(0, 10);
                                 },
                               ),
                               SizedBox(
@@ -207,8 +253,7 @@ class _HomeState extends State<Home> {
                               //
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
+                                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     border: Border.all(
@@ -216,8 +261,7 @@ class _HomeState extends State<Home> {
                                     )),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<Payment>(
-                                    items:
-                                        paymentString.keys.map((Payment value) {
+                                    items: paymentString.keys.map((Payment value) {
                                       return DropdownMenuItem<Payment>(
                                         value: value,
                                         child: Text(paymentString[value]),
@@ -258,6 +302,7 @@ class _HomeState extends State<Home> {
     //
   }
 
+  ///Todo:This affects performance of the app, consider adding the fields directly
   Widget _buildInputField(String label, String value, String labelName) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -282,11 +327,11 @@ class _HomeState extends State<Home> {
     expensesBox.add(
       ExpenseModel(
           date: date,
-          description: description,
+          description: itemDescriptionController.text,
           payment: payment,
-          price: price,
-          itemName: itemName,
-          quantity: quantity),
+          price: double.parse(itemPriceController.text),
+          itemName: itemNameController.text,
+          quantity: int.parse(itemQuantityController.text)),
     );
     Navigator.of(context).pop();
     print(expensesBox);
