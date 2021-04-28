@@ -1,0 +1,51 @@
+{
+    "editor.formatOnType": true,
+    "editor.fontFamily": "\"Cascadia Code\", \"Fira Code\"",
+    "editor.fontLigatures": true,
+    "editor.tabSize": 1,
+    "terminal.integrated.automationShell.windows": "",
+    "editor.autoIndent": "full",
+    "terminal.integrated.profiles.linux": {
+
+        "bash": {
+            "path": "bash"
+        },
+        "zsh": {
+            "path": "zsh"
+        },
+        "fish": {
+            "path": "fish"
+        },
+        "tmux": {
+            "path": "tmux"
+        },
+        "pwsh": {
+            "path": "pwsh"
+        }
+    },
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on",
+    "[markdown]": {
+
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": false
+    },
+    // Controls whether suggestions should automatically show up while typing.
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": true,
+        "strings": true
+    },
+    "editor.fontSize": 16,
+    "debug.console.fontSize": 16,
+    "terminal.integrated.fontSize": 17,
+    "terminal.integrated.fontFamily": "\"Cascadia Code\", \"monospace\"",
+    "fontAwesomeAutocomplete.disableTriggerWordAutoClearPatterns": [
+
+        "**/*.html"
+    ],
+
+
+
+}
