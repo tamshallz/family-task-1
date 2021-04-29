@@ -13,13 +13,10 @@ dependencies:
     sdk: flutter
   charts_flutter: ^0.10.0
   cupertino_icons: ^1.0.2
+  font_awesome_flutter: ^9.0.0
   google_fonts: ^2.0.0
-
-  # Hive Database
   hive: ^2.0.3
   hive_flutter: ^1.0.0
-
-  # For Date Formatting
   intl: ^0.17.0
   path_provider: ^2.0.1
 
@@ -32,8 +29,8 @@ dev_dependencies:
 
 flutter_icons:
   ios: true
-  android: 'launch_icon'
-  image_path: 'Images/budget.png'
+  android: "launch_icon"
+  image_path: "Images/budget.png"
 
 flutter:
   uses-material-design: true

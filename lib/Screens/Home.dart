@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 // import 'package:intl/intl.dart';
 
 import '../Models/expense_model.dart';
@@ -19,6 +20,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  var userInput = '';
+  var result = '';
+
   Box<ExpenseModel> expensesBox;
   DateTime date;
   final itemNameController = TextEditingController();
@@ -48,8 +52,8 @@ class _HomeState extends State<Home> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
-          widget.title,
-          style: GoogleFonts.pacifico(
+          'Expense App',
+          style: GoogleFonts.alef(
             fontSize: 30,
           ),
         ),
@@ -60,22 +64,51 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          children: [
-            Card(
-              child: Container(
-                height: MediaQuery.of(context).size.height / 4,
-              ),
-            ),
-            Expanded(
-              child: ValueListenableBuilder<Box<ExpenseModel>>(
-                valueListenable: Boxes.getExpenses().listenable(),
-                builder: (context, box, _) {
-                  //
-                  List keys = box.keys.cast<int>().toList();
-                  return ListView.builder(
+      body: Builder(
+        builder: (context) => ValueListenableBuilder<Box<ExpenseModel>>(
+          valueListenable: Boxes.getExpenses().listenable(),
+          builder: (context, box, _) {
+            //
+            List keys = box.keys.cast<int>().toList();
+
+            //* For Calculating the total expenses
+            final netExpense = box.values.fold(
+                0,
+                (previousValue, element) => element.itemName.isNotEmpty
+                    ? previousValue + element.price
+                    : previousValue - element.price);
+
+            final newExpenseString = '${netExpense.toStringAsFixed(2)}';
+            final color = netExpense > 0 ? Colors.purple : Colors.red;
+            if (box.values.isEmpty)
+              Center(
+                child: Text('No expenses added yet!'),
+              );
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.13,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        'Total Expenses Made So Far:',
+                        style: GoogleFonts.alef(
+                            fontSize: 25, color: Colors.white70),
+                      ),
+                      Text(
+                        '₦$newExpenseString',
+                        style: GoogleFonts.roboto(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: color),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
                     itemCount: keys.length,
                     itemBuilder: (context, index) {
                       //
@@ -85,11 +118,44 @@ class _HomeState extends State<Home> {
                       String payment = paymentString[currentExpense.payment];
 
                       return Dismissible(
-                        background: Container(
-                          color: Colors.red,
-                        ),
+                        background: redDismissibleContainer(),
                         onDismissed: (direction) {
-                          box.deleteAt(index);
+                          if (direction == DismissDirection.startToEnd) {
+                            setState(() {
+                              box.deleteAt(index);
+                              // showSnackBar(context);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('${currentExpense.itemName} Deleted!'),
+                              ),
+                            );
+                          }
+                        },
+                        confirmDismiss: (DismissDirection direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("Delete Confirmation"),
+                                content: const Text(
+                                    "Are you sure you want to delete this item?"),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text("Delete"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text("Cancel"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                         key: ValueKey(keys),
                         child: InkWell(
@@ -100,10 +166,12 @@ class _HomeState extends State<Home> {
                             payment,
                           ),
                           child: Card(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
                             child: Padding(
-                              padding: const EdgeInsets.all(15),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   /* 
                                   Todo: This was showing errors because the item name and description
@@ -127,7 +195,7 @@ class _HomeState extends State<Home> {
                                             '₦${currentExpense.price}',
                                             style: GoogleFonts.roboto(
                                               fontSize: 20,
-                                              color: Colors.green,
+                                              color: Color(0xFF9D86DE),
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -140,7 +208,8 @@ class _HomeState extends State<Home> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        currentExpense.date.toString(),
+                                        DateFormat.yMMMEd()
+                                            .format(currentExpense.date),
                                         style: GoogleFonts.acme(
                                           fontSize: 18,
                                           color: Colors.grey,
@@ -165,11 +234,11 @@ class _HomeState extends State<Home> {
                         ),
                       );
                     },
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -209,7 +278,7 @@ class _HomeState extends State<Home> {
                     style: GoogleFonts.acme(fontSize: 20, color: textColor),
                   ),
                   Text(
-                    'Created On: ${currentExpense.date.toString()}',
+                    'Created On:    ${DateFormat.yMMMMEEEEd().format(currentExpense.date)}',
                     style: GoogleFonts.acme(fontSize: 15, color: textColor),
                   ),
                   Text(
@@ -570,49 +639,10 @@ class _HomeState extends State<Home> {
     itemQuantityController.clear();
   }
 
-  Future dismissDialog(
-      ExpenseModel currentExpense, Box<ExpenseModel> box, int index) async {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => AlertDialog(
-        content: Text(
-          "Do you want to delete ${currentExpense.itemName}?",
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text("No"),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: Text("Yes"),
-            onPressed: () async {
-              await box.deleteAt(index);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  buildSwipeActionRight() => Container(
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        color: Colors.green,
-        child: Center(
-          child: Icon(
-            Icons.edit,
-            color: Colors.white,
-            size: 30,
-          ),
-        ),
+  Widget redDismissibleContainer() => Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: 60.0),
+        color: Colors.redAccent,
+        child: Icon(Icons.delete, color: Colors.white, size: 50),
       );
-
-  // void dismissExpenseCard() {
-  //   setState(() async {
-  //     await box.deleteAt(index);
-  //         Navigator.of(context).pop();
-  //   });
-  // }
 }
