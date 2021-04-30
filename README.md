@@ -15,10 +15,10 @@ Download apk with the link below:
 <!-- This below pattern of adding images is wrong because it cannot be resized -->
 <!-- ![Screenshot1](Images/Screenshot1.png)
 ![Screenshot1](Images/Screenshot2.png) -->
-<img src='Images/Screenshot1.png' alt='Screenshot1' width='200' >
-<img src='Images/Screenshot2.png' alt='Screenshot3' width='200' >
-<img src='Images/Screenshot3.png' alt='Screenshot4' width='200' >
-<img src='Images/Screenshot5.png' alt='Screenshot5' width='200' >
+<img align="left" src='Images/Screenshot1.png' alt='Screenshot1' width='200' >
+<img align="left" src='Images/Screenshot2.png' alt='Screenshot3' width='200' >
+<img align="right" src='Images/Screenshot3.png' alt='Screenshot4' width='200' >
+<img align="right" src='Images/Screenshot5.png' alt='Screenshot5' width='200' >
 <img src='Images/Screenshot6.png' alt='Screenshot6' width='200' >
 <img src='Images/Screenshot7.png' alt='Screenshot7' width='200' >
 <img src='Images/Screenshot8.png' alt='Screenshot8' width='200' >
