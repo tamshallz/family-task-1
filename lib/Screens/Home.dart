@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-// import 'package:intl/intl.dart';
 
+/// IN-APP IMPORT
 import '../Models/expense_model.dart';
 import '../boxes.dart';
 
@@ -12,25 +12,19 @@ const String expensesBoxName = 'expenses';
 
 class Home extends StatefulWidget {
   Home({Key key, this.title});
-
   final String title;
-
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  var userInput = '';
-  var result = '';
-
-  Box<ExpenseModel> expensesBox;
-  DateTime date;
   final itemNameController = TextEditingController();
   final itemDescriptionController = TextEditingController();
   final itemPriceController = TextEditingController();
   final itemQuantityController = TextEditingController();
   final dateController = TextEditingController();
-
+  Box<ExpenseModel> expensesBox;
+  DateTime date;
   Payment payment;
 
   @override
@@ -45,11 +39,15 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
+  //////////////////////////////////////////////! SCAFFOLD/BODY OF APP SECTION //////////////////////////////////////////////////////
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0XFFC6B5ED),
       resizeToAvoidBottomInset: true,
+
+      /// APPBAR
       appBar: AppBar(
         title: Text(
           'Expense App',
@@ -64,6 +62,8 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
+
+      /// BODY
       body: Builder(
         builder: (context) => ValueListenableBuilder<Box<ExpenseModel>>(
           valueListenable: Boxes.getExpenses().listenable(),
@@ -80,164 +80,170 @@ class _HomeState extends State<Home> {
 
             final newExpenseString = '${netExpense.toStringAsFixed(2)}';
             final color = netExpense > 0 ? Colors.purple : Colors.red;
-            if (box.values.isEmpty)
-              Center(
-                child: Text('No expenses added yet!'),
-              );
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.13,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        'Total Expenses Made So Far:',
-                        style: GoogleFonts.alef(
-                            fontSize: 25, color: Colors.white70),
-                      ),
-                      Text(
-                        '₦$newExpenseString',
-                        style: GoogleFonts.roboto(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: color),
-                      ),
-                    ],
-                  ),
+
+            /// BODY DISPLAY SECTION
+            if (box.values.isEmpty) {
+              return Center(
+                child: Text(
+                  'No expenses added yet!',
+                  style: GoogleFonts.alef(fontSize: 25),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: keys.length,
-                    itemBuilder: (context, index) {
-                      //
-                      final int key = keys[index];
+              );
+            } else
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.13,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          'Total Expenses Made So Far:',
+                          style: GoogleFonts.alef(
+                              fontSize: 25, color: Colors.white70),
+                        ),
+                        Text(
+                          '₦$newExpenseString',
+                          style: GoogleFonts.roboto(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: color),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: keys.length,
+                      itemBuilder: (context, index) {
+                        //
+                        final int key = keys[index];
 
-                      final ExpenseModel currentExpense = box.get(key);
-                      String payment = paymentString[currentExpense.payment];
+                        final ExpenseModel currentExpense = box.get(key);
+                        String payment = paymentString[currentExpense.payment];
 
-                      return Dismissible(
-                        background: redDismissibleContainer(),
-                        onDismissed: (direction) {
-                          if (direction == DismissDirection.startToEnd) {
-                            setState(() {
-                              box.deleteAt(index);
-                              // showSnackBar(context);
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('${currentExpense.itemName} Deleted!'),
-                              ),
-                            );
-                          }
-                        },
-                        confirmDismiss: (DismissDirection direction) async {
-                          return await showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text("Delete Confirmation"),
-                                content: const Text(
-                                    "Are you sure you want to delete this item?"),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    child: const Text("Delete"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: const Text("Cancel"),
-                                  ),
-                                ],
+                        return Dismissible(
+                          background: redDismissibleContainer(),
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.startToEnd) {
+                              setState(() {
+                                box.deleteAt(index);
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      '${currentExpense.itemName} Deleted!'),
+                                ),
                               );
-                            },
-                          );
-                        },
-                        key: ValueKey(keys),
-                        child: InkWell(
-                          onTap: () => buildShowDialogMenu(
-                            context,
-                            currentExpense,
-                            index,
-                            payment,
-                          ),
-                          child: Card(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              child: Column(
-                                children: <Widget>[
-                                  /* 
+                            }
+                          },
+                          confirmDismiss: (DismissDirection direction) async {
+                            return await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text("Delete Confirmation"),
+                                  content: const Text(
+                                      "Are you sure you want to delete this item?"),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: const Text("Delete"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: const Text("Cancel"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          key: ValueKey(keys),
+                          child: InkWell(
+                            onTap: () => buildDetail(
+                              context,
+                              currentExpense,
+                              index,
+                              payment,
+                            ),
+                            child: Card(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                child: Column(
+                                  children: <Widget>[
+                                    /* 
                                   Todo: This was showing errors because the item name and description
                                   where not saved in the box, consider checking for null values in
                                   Text Widgets to avoid null errors 
                                   */
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        currentExpense?.itemName ??
-                                            "No name added",
-                                        style: GoogleFonts.acme(
-                                          fontSize: 25,
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '₦${currentExpense.price}',
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 20,
-                                              color: Color(0xFF9D86DE),
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          currentExpense?.itemName ??
+                                              "No name added",
+                                          style: GoogleFonts.acme(
+                                            fontSize: 25,
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        DateFormat.yMMMEd()
-                                            .format(currentExpense.date),
-                                        style: GoogleFonts.acme(
-                                          fontSize: 18,
-                                          color: Colors.grey,
                                         ),
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.more_vert),
-                                        onPressed: () {
-                                          onUpdateDialog(
-                                            context,
-                                            index,
-                                            currentExpense,
-                                          );
-                                        },
-                                      )
-                                    ],
-                                  )
-                                ],
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '₦${currentExpense.price}',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 20,
+                                                color: Color(0xFF9D86DE),
+                                                // fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          DateFormat.yMMMEd()
+                                              .format(currentExpense.date),
+                                          style: GoogleFonts.acme(
+                                            fontSize: 18,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.edit,
+                                              color: Colors.grey),
+                                          onPressed: () {
+                                            onUpdateDialog(
+                                              context,
+                                              index,
+                                              currentExpense,
+                                            );
+                                          },
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
+                ],
+              );
           },
         ),
       ),
@@ -245,7 +251,11 @@ class _HomeState extends State<Home> {
     //
   }
 
-  Future buildShowDialogMenu(BuildContext context, ExpenseModel currentExpense,
+  //////////////////////////////////////////////! WIDGETS SECTION //////////////////////////////////////////////////////
+
+  //* DETAIL CONTAINER WIDGET
+
+  Future buildDetail(BuildContext context, ExpenseModel currentExpense,
       int index, String payment) {
     Color textColor = Colors.white;
     return showDialog(
@@ -299,6 +309,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // * ADDING NEW EXPENSE TO THE LISTVIEW WIDGET
   Future buildShowDialog(BuildContext context) {
     return showDialog(
         context: (context),
@@ -306,12 +317,12 @@ class _HomeState extends State<Home> {
           return Dialog(
               child: Container(
             padding: const EdgeInsets.all(10),
-            // height: 520,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // TITLE TEXT
                   Center(
                     child: Text(
                       'New Item',
@@ -321,7 +332,9 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20.0),
+                  SizedBox(height: 15.0),
+
+                  // NAME INPUT
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: TextFormField(
@@ -335,7 +348,8 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 5.0),
+
+                  // DESCRIPTION INPUT
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: TextFormField(
@@ -362,15 +376,8 @@ class _HomeState extends State<Home> {
                         child: TextFormField(
                           controller: itemPriceController,
                           keyboardType: TextInputType.number,
-                          // autofocus: true,
-                          // initialValue: "",
                           decoration: InputDecoration(
                               border: InputBorder.none, labelText: 'Price'),
-                          // onChanged: (value) {
-                          //   setState(() {
-                          //     price = double.parse(value);
-                          //   });
-                          // },
                         ),
                       ),
                     ),
@@ -392,7 +399,7 @@ class _HomeState extends State<Home> {
                     height: 15,
                   ),
 
-                  // THE dropdown section
+                  // THE DROPDOWN SECTION
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.only(left: 10.0, right: 10.0),
@@ -411,9 +418,9 @@ class _HomeState extends State<Home> {
                         }).toList(),
                         value: payment,
                         hint: Text('Payment'),
-                        onChanged: (value) {
+                        onChanged: (paymentValue) {
                           setState(() {
-                            payment = value;
+                            payment = paymentValue;
                           });
                         },
                       ),
@@ -442,7 +449,7 @@ class _HomeState extends State<Home> {
         });
   }
 
-  //* EDITING
+  //* EDITING EXPENSE WIDGET
   Future onUpdateDialog(
       BuildContext context, int index, ExpenseModel currentExpense) {
     return showDialog(
@@ -459,7 +466,7 @@ class _HomeState extends State<Home> {
                 children: [
                   Center(
                     child: Text(
-                      'New Item',
+                      'Edit Item',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -591,6 +598,7 @@ class _HomeState extends State<Home> {
 
   /// * This affects performance of the app, consider adding the fields directly
 
+  // * ADDING EXPENSE FUNCTION FOR ADD BUTTON
   void onFormSubmit() {
     Box<ExpenseModel> expensesBox = Hive.box<ExpenseModel>(expensesBoxName);
 
@@ -610,7 +618,7 @@ class _HomeState extends State<Home> {
     clearTextField();
   }
 
-  //* Updating my expense
+  //* UPDATING EXPENSE FUNCTION
   void onUpdate(int index) {
     Box<ExpenseModel> expensesBox = Hive.box<ExpenseModel>(expensesBoxName);
 
@@ -639,6 +647,7 @@ class _HomeState extends State<Home> {
     itemQuantityController.clear();
   }
 
+  //* CONTAINER WITH BACKGROUND COLOR FOR DISMISSING WIDGET FROM LISTVIEW
   Widget redDismissibleContainer() => Container(
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.only(left: 60.0),
