@@ -16,7 +16,7 @@ Download apk with the link below:
 <!-- ![Screenshot1](Images/Screenshot1.png)
 ![Screenshot1](Images/Screenshot2.png) -->
 <img src='Images/Screenshot1.png' alt='Screenshot1' width='200' >
-<img src='Images/Screenshot2.png' alt='Screenshot3' style='width:200px' >
+<img src='Images/Screenshot2.png' alt='Screenshot3' width='200' >
 <img src='Images/Screenshot3.png' alt='Screenshot4' width='200' >
 <img src='Images/Screenshot5.png' alt='Screenshot5' width='200' >
 <img src='Images/Screenshot6.png' alt='Screenshot6' width='200' >
