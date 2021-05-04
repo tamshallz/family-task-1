@@ -1,11 +1,12 @@
-import 'package:family_task/Models/expense_model.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import './Screens/Home.dart';
+import 'Screens/HomePage.dart';
+import 'Models/expense_model.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(ExpenseModelAdapter());
@@ -21,9 +22,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Task One',
       theme: ThemeData(
+        textTheme: GoogleFonts.alefTextTheme(),
         primaryColor: Color(0xFF9D86DE),
       ),
-      home: Home(title: 'Welcome!'),
+      home: HomePage(title: 'Welcome!'),
     );
   }
 }
