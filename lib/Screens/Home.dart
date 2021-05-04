@@ -23,6 +23,13 @@ class _HomeState extends State<Home> {
   final itemPriceController = TextEditingController();
   final itemQuantityController = TextEditingController();
   final dateController = TextEditingController();
+
+  //Edit Controllers
+  final editItemNameController = TextEditingController();
+  final editItemDescriptionController = TextEditingController();
+  final editItemPriceController = TextEditingController();
+  final editItemQuantityController = TextEditingController();
+
   Box<ExpenseModel> expensesBox;
   DateTime date;
   Payment payment;
@@ -36,11 +43,15 @@ class _HomeState extends State<Home> {
     itemDescriptionController.dispose();
     itemPriceController.dispose();
     itemQuantityController.dispose();
+
+    editItemNameController.dispose();
+    editItemDescriptionController.dispose();
+    editItemPriceController.dispose();
+    editItemQuantityController.dispose();
     super.dispose();
   }
 
   //////////////////////////////////////////////! SCAFFOLD/BODY OF APP SECTION //////////////////////////////////////////////////////
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,15 +111,12 @@ class _HomeState extends State<Home> {
                       children: [
                         Text(
                           'Total Expenses Made So Far:',
-                          style: GoogleFonts.alef(
-                              fontSize: 25, color: Colors.white70),
+                          style: GoogleFonts.alef(fontSize: 25, color: Colors.white70),
                         ),
                         Text(
                           '₦$newExpenseString',
                           style: GoogleFonts.roboto(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: color),
+                              fontSize: 30, fontWeight: FontWeight.bold, color: color),
                         ),
                       ],
                     ),
@@ -132,8 +140,7 @@ class _HomeState extends State<Home> {
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                      '${currentExpense.itemName} Deleted!'),
+                                  content: Text('${currentExpense.itemName} Deleted!'),
                                 ),
                               );
                             }
@@ -144,17 +151,14 @@ class _HomeState extends State<Home> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: const Text("Delete Confirmation"),
-                                  content: const Text(
-                                      "Are you sure you want to delete this item?"),
+                                  content: const Text("Are you sure you want to delete this item?"),
                                   actions: <Widget>[
                                     TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(true),
+                                      onPressed: () => Navigator.of(context).pop(true),
                                       child: const Text("Delete"),
                                     ),
                                     TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(false),
+                                      onPressed: () => Navigator.of(context).pop(false),
                                       child: const Text("Cancel"),
                                     ),
                                   ],
@@ -171,25 +175,21 @@ class _HomeState extends State<Home> {
                               payment,
                             ),
                             child: Card(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
+                              margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
+                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                                 child: Column(
                                   children: <Widget>[
-                                    /* 
+                                    /*
                                   Todo: This was showing errors because the item name and description
                                   where not saved in the box, consider checking for null values in
-                                  Text Widgets to avoid null errors 
+                                  Text Widgets to avoid null errors
                                   */
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          currentExpense?.itemName ??
-                                              "No name added",
+                                          currentExpense?.itemName ?? "No name added",
                                           style: GoogleFonts.acme(
                                             fontSize: 25,
                                           ),
@@ -209,20 +209,17 @@ class _HomeState extends State<Home> {
                                       ],
                                     ),
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          DateFormat.yMMMEd()
-                                              .format(currentExpense.date),
+                                          DateFormat.yMMMEd().format(currentExpense.date),
                                           style: GoogleFonts.acme(
                                             fontSize: 18,
                                             color: Colors.grey,
                                           ),
                                         ),
                                         IconButton(
-                                          icon: Icon(Icons.edit,
-                                              color: Colors.grey),
+                                          icon: Icon(Icons.edit, color: Colors.grey),
                                           onPressed: () {
                                             onUpdateDialog(
                                               context,
@@ -252,11 +249,9 @@ class _HomeState extends State<Home> {
   }
 
   //////////////////////////////////////////////! WIDGETS SECTION //////////////////////////////////////////////////////
-
   //* DETAIL CONTAINER WIDGET
 
-  Future buildDetail(BuildContext context, ExpenseModel currentExpense,
-      int index, String payment) {
+  Future buildDetail(BuildContext context, ExpenseModel currentExpense, int index, String payment) {
     Color textColor = Colors.white;
     return showDialog(
       context: context,
@@ -298,9 +293,7 @@ class _HomeState extends State<Home> {
                   Text(
                     'Cost Price:  ₦${currentExpense.price}',
                     style: GoogleFonts.roboto(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: textColor),
+                        fontWeight: FontWeight.bold, fontSize: 20, color: textColor),
                   ),
                 ],
               ),
@@ -376,8 +369,7 @@ class _HomeState extends State<Home> {
                         child: TextFormField(
                           controller: itemPriceController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                              border: InputBorder.none, labelText: 'Price'),
+                          decoration: InputDecoration(border: InputBorder.none, labelText: 'Price'),
                         ),
                       ),
                     ),
@@ -390,8 +382,8 @@ class _HomeState extends State<Home> {
                       controller: itemQuantityController,
                       keyboardType: TextInputType.number,
                       // autofocus: true,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(), labelText: 'Quantity'),
+                      decoration:
+                          InputDecoration(border: OutlineInputBorder(), labelText: 'Quantity'),
                     ),
                   ),
 
@@ -450,8 +442,13 @@ class _HomeState extends State<Home> {
   }
 
   //* EDITING EXPENSE WIDGET
-  Future onUpdateDialog(
-      BuildContext context, int index, ExpenseModel currentExpense) {
+  Future onUpdateDialog(BuildContext context, int index, ExpenseModel currentExpense) {
+    Payment paymentMode = currentExpense.payment;
+    editItemNameController.text = currentExpense.itemName;
+    editItemDescriptionController.text = currentExpense.description;
+    editItemPriceController.text = currentExpense.price.toString(); //Convert from double to String
+    editItemQuantityController.text = currentExpense.quantity.toString(); //Convert from int to
+    // String
     return showDialog(
         context: (context),
         builder: (_) {
@@ -459,137 +456,157 @@ class _HomeState extends State<Home> {
               child: Container(
             padding: const EdgeInsets.all(10),
             // height: 520,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      'Edit Item',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20.0),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.sentences,
-                      textInputAction: TextInputAction.next,
-                      controller: itemNameController,
-                      decoration: InputDecoration(
-                        labelText: "Item Name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 5.0),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.sentences,
-                      textInputAction: TextInputAction.next,
-                      controller: itemDescriptionController,
-                      decoration: InputDecoration(
-                        labelText: "Item Description",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-
-                  // PRICE INPUT
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(3),
-                          border: Border.all(color: Colors.grey)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: TextFormField(
-                          controller: itemPriceController,
-                          keyboardType: TextInputType.number,
-                          // autofocus: true,
-                          // initialValue: "",
-                          decoration: InputDecoration(
-                              border: InputBorder.none, labelText: 'Price'),
-                          // onChanged: (value) {
-                          //   setState(() {
-                          //     price = double.parse(value);
-                          //   });
-                          // },
+            child: StatefulBuilder(
+              builder: (context, setState) => SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'Edit Item',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ),
-
-                  // QUANTITY INPUT
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: TextField(
-                      controller: itemQuantityController,
-                      keyboardType: TextInputType.number,
-                      // autofocus: true,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(), labelText: 'Quantity'),
+                    SizedBox(height: 20.0),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        textCapitalization: TextCapitalization.sentences,
+                        textInputAction: TextInputAction.next,
+                        controller: editItemNameController,
+                        decoration: InputDecoration(
+                          labelText: "Item Name",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 5.0),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        textCapitalization: TextCapitalization.sentences,
+                        textInputAction: TextInputAction.next,
+                        controller: editItemDescriptionController,
+                        decoration: InputDecoration(
+                          labelText: "Item Description",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
 
-                  SizedBox(
-                    height: 15,
-                  ),
+                    // PRICE INPUT
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            border: Border.all(color: Colors.grey)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TextFormField(
+                            controller: editItemPriceController,
+                            keyboardType: TextInputType.number,
+                            // autofocus: true,
+                            // initialValue: "",
+                            decoration:
+                                InputDecoration(border: InputBorder.none, labelText: 'Price'),
+                            // onChanged: (value) {
+                            //   setState(() {
+                            //     price = double.parse(value);
+                            //   });
+                            // },
+                          ),
+                        ),
+                      ),
+                    ),
 
-                  // THE dropdown section
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          color: Colors.grey,
-                        )),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<Payment>(
-                        items: paymentString.keys.map((Payment value) {
-                          return DropdownMenuItem<Payment>(
-                            value: value,
-                            child: Text(paymentString[value]),
+                    // QUANTITY INPUT
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: TextField(
+                        controller: editItemQuantityController,
+                        keyboardType: TextInputType.number,
+                        // autofocus: true,
+                        decoration:
+                            InputDecoration(border: OutlineInputBorder(), labelText: 'Quantity'),
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: 15,
+                    ),
+
+                    // THE dropdown section
+                    ///Todo: Make sure the dropdown updates state when value is selected
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: Colors.grey,
+                          )),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<Payment>(
+                          items: paymentString.keys.map((Payment value) {
+                            return DropdownMenuItem<Payment>(
+                              value: value,
+                              child: Text(paymentString[value]),
+                            );
+                          }).toList(),
+                          value: paymentMode,
+                          hint: Text('Payment'),
+                          onChanged: (value) {
+                            setState(() {
+                              paymentMode = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+
+                    // INPUT BUTTON
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Color(0xFF9D86DE),
+                        ),
+                        onPressed: () {
+                          // onUpdate(index);
+                          Box<ExpenseModel> expensesBox = Hive.box<ExpenseModel>(expensesBoxName);
+
+                          expensesBox.putAt(
+                            index,
+                            ExpenseModel(
+                              date: DateTime.now(),
+                              description: editItemDescriptionController.text,
+                              payment: paymentMode,
+                              price: double.parse(editItemPriceController.text),
+                              itemName: editItemNameController.text,
+                              quantity: int.parse(
+                                editItemQuantityController.text,
+                              ),
+                            ),
                           );
-                        }).toList(),
-                        value: payment,
-                        hint: Text('Payment'),
-                        onChanged: (value) {
-                          setState(() {
-                            payment = value;
-                          });
+                          Navigator.of(context).pop();
+                          clearEditTextFields();
                         },
+                        child: Center(
+                          child: Text('Update'),
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-
-                  // INPUT BUTTON
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF9D86DE),
-                      ),
-                      onPressed: () {
-                        onUpdate(index);
-                      },
-                      child: Center(
-                        child: Text('Save'),
-                      ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           ));
@@ -597,7 +614,6 @@ class _HomeState extends State<Home> {
   }
 
   /// * This affects performance of the app, consider adding the fields directly
-
   // * ADDING EXPENSE FUNCTION FOR ADD BUTTON
   void onFormSubmit() {
     Box<ExpenseModel> expensesBox = Hive.box<ExpenseModel>(expensesBoxName);
@@ -645,6 +661,13 @@ class _HomeState extends State<Home> {
     itemDescriptionController.clear();
     itemPriceController.clear();
     itemQuantityController.clear();
+  }
+
+  void clearEditTextFields() {
+    editItemNameController.clear();
+    editItemDescriptionController.clear();
+    editItemPriceController.clear();
+    editItemQuantityController.clear();
   }
 
   //* CONTAINER WITH BACKGROUND COLOR FOR DISMISSING WIDGET FROM LISTVIEW
