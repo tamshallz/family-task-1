@@ -1,4 +1,10 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// *
 import '../Models/expense_model.dart';
@@ -12,18 +18,20 @@ class ExpenseDialog extends StatefulWidget {
     int quantity,
     DateTime date,
     Payment payment,
+    // Uint8List image,
   ) onClickedDone;
 
-  const ExpenseDialog({
-    this.expenseModel,
-    @required this.onClickedDone,
-  });
+  const ExpenseDialog({this.expenseModel, @required this.onClickedDone});
 
   @override
   _ExpenseDialogState createState() => _ExpenseDialogState();
 }
 
 class _ExpenseDialogState extends State<ExpenseDialog> {
+  PickedFile fileImage;
+
+  String _string = "";
+
   final formKey = GlobalKey<FormState>();
   final itemNameController = TextEditingController();
   final itemDescriptionController = TextEditingController();
@@ -73,6 +81,38 @@ class _ExpenseDialogState extends State<ExpenseDialog> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               SizedBox(height: 8),
+              // GestureDetector(
+              //   onTap: () async {
+              //     // pickImage();
+
+              //     fileImage =
+              //         await ImagePicker().getImage(source: ImageSource.gallery);
+
+              //     setState(() {
+              //       // ignore: unnecessary_statements
+              //       fileImage;
+              //     });
+              //   },
+              //   child: Container(
+              //     height: MediaQuery.of(context).size.height * 0.15,
+              //     // width: 140,
+              //     decoration: BoxDecoration(
+              //         // shape: BoxShape.circle,
+
+              //         borderRadius: BorderRadius.circular(6),
+              //         border: Border.all(color: Colors.grey),
+              //         color: Colors.grey[100]),
+              //     child: fileImage != null
+              //         ? Image.file(File(fileImage.path))
+              //         : Center(
+              //             child: Icon(
+              //               Icons.camera_alt,
+              //               color: Colors.grey[800],
+              //             ),
+              //           ),
+              //   ),
+              // ),
+              SizedBox(height: 8),
               buildName(
                   itemNameController, 'Item Name', 'Enter Item Name', maxLines),
               SizedBox(height: 8),
@@ -93,6 +133,31 @@ class _ExpenseDialogState extends State<ExpenseDialog> {
         buildAddButton(context, isEditing: isEditing),
       ],
     );
+  }
+
+  // buildFileImage() => Image.file(
+  //       fileImage,
+  //       height: 150,
+  //       fit: BoxFit.cover,
+  //     );
+
+  Future pickImage() async {
+    final picker = ImagePicker();
+
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    final directory = await getApplicationDocumentsDirectory();
+
+    final name = basename(pickedFile.path);
+
+    final imageFile = File('${directory.path}/$name');
+
+    // setState(() {
+    //   if (pickedFile != null) {
+    //     _string = imageFile.path;
+    //     fileImage = File(pickedFile.path);
+    //   }
+    // });
   }
 
   Widget buildName(TextEditingController controller, String hintText,
@@ -181,6 +246,7 @@ class _ExpenseDialogState extends State<ExpenseDialog> {
           final description = itemDescriptionController.text;
           final price = double.tryParse(itemPriceController.text) ?? 0;
           final quantity = int.tryParse(itemQuantityController.text) ?? 0;
+          // final image = await fileImage.readAsBytes();
 
           widget.onClickedDone(
               itemName, description, price, quantity, date, payment);

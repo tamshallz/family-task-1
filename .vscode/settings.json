@@ -1,6 +1,6 @@
 {
     "editor.formatOnType": true,
-    "editor.fontFamily": "\"Cascadia Code\", \"Fira Code\"",
+    "editor.fontFamily": "Cascadia Code",
     "editor.fontLigatures": true,
     "editor.tabSize": 1,
     "terminal.integrated.automationShell.windows": "",
@@ -37,7 +37,7 @@
         "comments": true,
         "strings": true
     },
-    "editor.fontSize": 16,
+    "editor.fontSize": 20,
     "debug.console.fontSize": 16,
     "terminal.integrated.fontSize": 17,
     "terminal.integrated.fontFamily": "\"Cascadia Code\", \"monospace\"",

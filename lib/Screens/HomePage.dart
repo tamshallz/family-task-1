@@ -1,13 +1,19 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// IN-APP IMPORT
 import '../Models/expense_model.dart';
 import '../boxes.dart';
 import '../widget/expense_dialog.dart';
+import '../widget/SearchWidgets.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -17,7 +23,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Box<ExpenseModel> expensesBox;
+  List<ExpenseModel> expenses;
+
+  PickedFile fileImage;
   DateTime date;
   Payment payment;
   @override
@@ -32,13 +40,17 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Color(0XFFC6B5ED),
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(
-          'Expense App',
-          style: GoogleFonts.alef(
-            fontSize: 30,
-          ),
-        ),
+        title: Text('Expense App', style: GoogleFonts.alef(fontSize: 30)),
+        actions: [
+          IconButton(
+              icon: Icon(FontAwesomeIcons.search),
+              onPressed: () => showSearch(
+                    context: context,
+                    delegate: ExpensesSearch(expenses),
+                  )),
+        ],
       ),
+      drawer: Drawer(),
       body: ValueListenableBuilder<Box<ExpenseModel>>(
         valueListenable: Boxes.getExpenses().listenable(),
         builder: (context, box, _) {
@@ -166,22 +178,24 @@ class _HomePageState extends State<HomePage> {
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         color: Colors.white,
-        child: ListTile(
-          dense: true,
-          onTap: () {
-            Color textColor = Colors.white;
-            buildOnTapShowDetail(
-              context,
-              expenseModel,
-              textColor,
-              payment,
-            );
-          },
+        child: ExpansionTile(
           leading: ClipOval(
             child: Container(
-              color: Colors.purple,
+              color: Colors.grey[200],
               height: 50,
               width: 50,
+              // child: Center(
+              //   child: expenseModel.image != null
+              //       ? Image.file(
+              //           File.fromRawPath(expenseModel.image),
+              //         )
+              //       : Center(
+              //           child: Text(
+              //             'No Image',
+              //             style: TextStyle(fontSize: 10),
+              //           ),
+              //         ),
+              // ),
             ),
           ),
           title: Padding(
@@ -192,34 +206,6 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 25,
               ),
             ),
-          ),
-          subtitle: Row(
-            children: [
-              Text(
-                date,
-                style: GoogleFonts.acme(
-                  fontSize: 18,
-                  color: Colors.grey,
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  size: 20,
-                  color: Colors.grey.shade300,
-                ),
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (context) => ExpenseDialog(
-                    expenseModel: expenseModel,
-                    onClickedDone: (itemName, description, price, quantity,
-                            date, payment) =>
-                        editExpense(expenseModel, itemName, description, price,
-                            quantity, date, payment),
-                  ),
-                ),
-              ),
-            ],
           ),
           trailing: Padding(
             padding: const EdgeInsets.only(top: 5, right: 10),
@@ -233,9 +219,54 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          subtitle: Text(
+            date,
+            style: GoogleFonts.acme(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                buildExpansionChild(
+                    context: context,
+                    icon: FontAwesomeIcons.edit,
+                    text: 'Edit',
+                    onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => ExpenseDialog(
+                            expenseModel: expenseModel,
+                            onClickedDone: (itemName, description, price,
+                                    quantity, date, payment) =>
+                                editExpense(expenseModel, itemName, description,
+                                    price, quantity, date, payment)))),
+                buildExpansionChild(
+                    onPressed: () {
+                      Color textColor = Colors.white;
+                      buildOnTapShowDetail(
+                          context, expenseModel, textColor, payment);
+                    },
+                    icon: Icons.more_vert_sharp,
+                    text: ('More'))
+              ],
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  TextButton buildExpansionChild(
+      {BuildContext context, Function onPressed, IconData icon, String text}) {
+    return TextButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, color: Colors.purple),
+        label: Text(
+          text,
+          style: TextStyle(fontSize: 22, color: Colors.purple),
+        ));
   }
 
 //! Function to show detail of each Card
@@ -294,7 +325,8 @@ class _HomePageState extends State<HomePage> {
 
 //! Function to ADD item to the Box
   Future addExpense(String itemName, String description, double price,
-      int quantity, DateTime date, Payment payment) async {
+      int quantity, DateTime date, Payment payment) {
+    // Uint8List imageByte = await fileImage.readAsBytes();
     final expense = ExpenseModel()
       ..itemName = itemName
       ..description = description
@@ -302,6 +334,7 @@ class _HomePageState extends State<HomePage> {
       ..price = price
       ..quantity = quantity
       ..payment = payment;
+    // ..image = imageByte;
 
     final box = Boxes.getExpenses();
     box.add(expense);
@@ -309,19 +342,21 @@ class _HomePageState extends State<HomePage> {
 
 //! Function to Edit item in the Box
   void editExpense(
-      ExpenseModel expenseModel,
-      String itemName,
-      String description,
-      double price,
-      int quantity,
-      DateTime date,
-      Payment payment) {
+    ExpenseModel expenseModel,
+    String itemName,
+    String description,
+    double price,
+    int quantity,
+    DateTime date,
+    Payment payment,
+  ) {
     expenseModel.itemName = itemName;
     expenseModel.description = description;
     expenseModel.price = price;
     expenseModel.quantity = quantity;
     expenseModel.date = date;
     expenseModel.payment = payment;
+    // expenseModel.image = image;
 
     expenseModel.save();
   }

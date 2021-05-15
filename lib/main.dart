@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'Screens/HomePage.dart';
 import 'Models/expense_model.dart';
+import 'Auth Screens/Screens.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,13 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.alefTextTheme(),
         primaryColor: Color(0xFF9D86DE),
       ),
-      home: HomePage(title: 'Welcome!'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(title: 'Welcome!'),
+        'ForgottenPassword': (context) => ForgottenPassword(),
+        'CreateAccount': (context) => CreateAccount(),
+        'SignIn': (context) => LoginScreen(),
+      },
     );
   }
 }

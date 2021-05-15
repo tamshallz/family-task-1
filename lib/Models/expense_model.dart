@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hive/hive.dart';
 // import 'package:intl/intl.dart';
 
@@ -21,6 +23,8 @@ class ExpenseModel extends HiveObject {
   DateTime date;
   @HiveField(6)
   Payment payment;
+  // @HiveField(7)
+  // Uint8List image;
 
 // class constructor
   ExpenseModel({
@@ -30,6 +34,7 @@ class ExpenseModel extends HiveObject {
     this.price,
     this.quantity,
     this.payment,
+    // this.image,
   });
 }
 

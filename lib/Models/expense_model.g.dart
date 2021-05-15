@@ -62,13 +62,14 @@ class ExpenseModelAdapter extends TypeAdapter<ExpenseModel> {
       price: fields[3] as double,
       quantity: fields[2] as int,
       payment: fields[6] as Payment,
+      // image: fields[7] as Uint8List,
     );
   }
 
   @override
   void write(BinaryWriter writer, ExpenseModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(1)
       ..write(obj.itemName)
       ..writeByte(2)
@@ -81,6 +82,8 @@ class ExpenseModelAdapter extends TypeAdapter<ExpenseModel> {
       ..write(obj.date)
       ..writeByte(6)
       ..write(obj.payment);
+    // ..writeByte(7)
+    // ..write(obj.image);
   }
 
   @override
